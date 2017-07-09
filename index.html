@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<!-- CSP support mode (required for Windows Universal apps): https://docs.angularjs.org/api/ng/directive/ngCsp  ng-app="app" --> 
+<html lang="en" ng-app="wholeApp" ng-csp>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+	<meta http-equiv="Content-Security-Policy" 
+	content="default-src *; 
+	style-src * 'self' 'unsafe-inline' 'unsafe-eval'; 
+	script-src * 'self' 'unsafe-inline' 'unsafe-eval';">
+
+    <!-- CSS dependencies -->
+    <link rel="stylesheet" href="lib/onsen/css/onsenui.css" />
+    <link rel="stylesheet" href="lib/onsen/css/onsen-css-components-blue-basic-theme.css" />
+
+    <!-- CSP support mode (required for Windows Universal apps) -->
+    <link rel="stylesheet" href="lib/angular/angular-csp.css" />
+     <link rel="stylesheet" href="css/styleSheet.css" />
+        
+	<title>Registration</title>
+	
+	<meta name="format-detection" content="telephone=no">
+	<meta name="msapplication-tap-highlight" content="no">
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+	<link rel="stylesheet" type="text/css" href="css/index.css">
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> 
+	
+	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="scripts/platformOverrides.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+	<script src="lib/angular/angular.js"></script>
+	<script src="lib/onsen/js/onsenui.js"></script>
+	<script src="http://code.jquery.com/jquery-1.4.3.min.js" ></script>
+	<script src="js/md5.js"></script>
+	<script src="cordova.js"></script>
+	<script src="scripts/index.js"></script>	
+	<script src="js/apps.js"></script>
+
+</head>
+
+<body>
+
+<ons-navigator var="navi" id="login">
+        <ons-page> 
+                <ons-toolbar>
+						<div class="left"></div>
+                        <div class="center">
+							<p align="center">SmartHVAC</p>
+						</div>
+                </ons-toolbar>
+                
+                <!--<div>
+                        <br><div>Please select your privileges level:</div>
+                        
+                        <label>
+                          <input id="isHomeOwner" type="radio" name="r" checked="checked">Home Owner
+                          <div class="checkbox__checkmark"></div>
+                        </label><br>        
+
+                        <label>
+                          <input id="isCommunityOwner" type="radio" name="r">Community Owner
+                          <div class="checkbox__checkmark"></div>
+                        </label><br>         
+
+                        <label>
+                          <input id="isCityOwner" type="radio" name="r">City Owner
+                          <div class="checkbox__checkmark"></div>
+                        </label><br>         
+
+                        <label>
+                          <input id="isStateOwner" type="radio" name="r">State Owner
+                          <div class="checkbox__checkmark"></div>
+                        </label><br> 
+                        
+                        <label>
+                          <input id="isAdministrator" type="radio" name="r">Administrator
+                          <div class="checkbox__checkmark"></div>
+                        </label>
+                </div>-->
+				<br><br><br><br><br>
+                <div class="login-form" ng-controller="login">
+                        <input type="username" id="id" class="text-input--underbar" placeholder="Username" value="">
+                        <input type="password" id="password" class="text-input--underbar" placeholder="Password" value="">
+                        <div class="wrong_password">{{getapi_error}}</div>
+                        <br><br>
+                        <ons-button modifier="large" class="login-button" ng-click="login()">Log In</ons-button>    
+						<br><br>
+                        <div><ons-button modifier="quiet" style="color:#000;" class="forgot-password">Forgot password?</ons-button></div>
+                        
+                </div>
+				<div id="test"></div>
+                
+        </ons-page>
+</ons-navigator>
+
+<ons-template id="ListOfHouses">
+        <ons-page>
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">List Of Houses</div>
+                </ons-toolbar>
+				
+				<ons-list ng-controller="ListOfHouses">
+					<ons-list-item modifier="chevron" class="item" ng-repeat="item in Hnames" ng-click="showDevices($index)">
+						<ons-row>
+							<ons-col>
+								<header style="margin-left:25px">
+									<span class="item-title"><strong>ID</strong>:{{item.id}}<br><strong>Name</strong>:{{item.name}}<br><strong>Type</strong>:{{item.type}}</span>
+								</header>
+							</ons-col>
+						</ons-row>
+					</ons-list-item>
+				</ons-list>
+						
+				
+        </ons-page>
+</ons-template>
+
+<ons-template id="ListOfDevices">
+        <ons-page>
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">List Of Devices</div>
+                </ons-toolbar>
+
+				<ons-list ng-controller="ListOfDevices">
+					<ons-list-item  class="item" ng-repeat="item in Json" ">
+						<ons-row>
+							<ons-col>
+								<header style="margin-left:25px">
+									<span class="item-title">{{item.model}}</span>
+								</header>
+							</ons-col>
+							<ons-col>
+							</ons-col>
+							<ons-col>
+							</ons-col>
+							<ons-col>
+							</ons-col>
+							<ons-col>
+							</ons-col>
+							<ons-col>
+								<ons-button modifier="small" ng-click="prompt(this)" id="{{item.id}}" class="button-bar" style="text-align:center;background:#e74c3c;margin-right:15px;">Delete</ons-button>
+							</ons-col>
+							<ons-col style="float:right">
+							<label class="switch">
+								<input type="checkbox" ng-model="confirmed" class="switch__input" ng-checked="{{item.status}}" ng-change="control(this,{{item.id}})">
+								<div class="switch__toggle"></div>
+							</label>
+							</ons-col>
+						</ons-row>
+					</ons-list-item>
+				</ons-list>
+				
+				<br><br>
+				<div ng-controller="AddDeviceCont">
+					<ons-button modifier="small" class="button-bar" style="text-align:center" ng-click="addDevice()">Add Device</ons-button>
+				</div>
+					<br>
+				<div ng-controller="BillCont">
+					<ons-button modifier="small" class="button-bar" style="text-align:center" ng-click="viewBills()">View Bill</ons-button>
+				</div>
+					<br>
+				<!--<div ng-controller="delete">
+					<ons-button modifier="small" class="button-bar" style="text-align:center" ng-click="prompt()">Remove Device</ons-button>
+				</div>-->
+				
+				
+        </ons-page>
+		
+</ons-template>
+
+<ons-template id="RegisterDevice">
+        <ons-page> <!--ng-controller="ConsumptionAnalysis"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Add Device</div>
+                </ons-toolbar>
+                
+                <div class="login-form" ng-controller="RegisterDevice">
+                        <input type="username" id="deviceID" class="text-input--underbar" placeholder="Device ID" value="">
+                        <input type="username" id="manufacturer" class="text-input--underbar" placeholder="Manufacturer" value="">
+                        <input type="username" id="type" class="text-input--underbar" placeholder="Type" value="">
+                        <input type="username" id="model" class="text-input--underbar" placeholder="Model" value="">
+                        
+                        <br><br>
+                        <ons-button modifier="large" class="login-button" ng-click="AddDeviceFunction()">Add Device</ons-button>        
+                        <br><br>
+                        
+                </div>
+                
+
+        </ons-page>
+</ons-template>  
+   
+  
+<ons-template id="HousePageDetails">
+        <ons-page> 
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">House Page</div>
+                </ons-toolbar>
+                
+                <div ng-controller="HousePageDetails">
+					<br>
+					<ons-button modifier="large" ng-click="DevicesControlHousePageDetails()">Control Devices</ons-button>
+					<br>
+					<ons-button modifier="large" ng-click="HomeGraphs()">Home Owner Graphs</ons-button>
+					<br>
+				
+					
+					<div ng-repeat="item in Privilage">
+						<ons-button modifier="large" ng-click="DoSome(this)">
+						{{item.name}}
+						</ons-button>
+						<br>
+					</div>
+					<br><br>
+					<ons-list modifier="inset" class="settings-list">
+						<ons-list-item modifier="">
+							<ons-icon icon="ion-log-out" style="opacity: 0.8"></ons-icon>
+							Your API is: {{api}}
+						</ons-list-item>
+					</ons-list>
+						
+                </div>
+                
+        </ons-page>
+</ons-template>
+
+<ons-template id="AdminPage">
+        <ons-page> <!--ng-controller="DevicesControl"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Welcome Administrator</div>
+                </ons-toolbar>
+        
+                <div ng-controller="AdminPage">
+                        <br> <!--"DevicesControl"-->
+                        <ons-button modifier="large" ng-click="Register()">Register</ons-button>
+                        <br>
+                        <ons-button modifier="large" ng-click="Update()">Update</ons-button>
+                        <br>
+                        <ons-button modifier="large" ng-click="Delete()">Delete</ons-button>
+                </div>
+
+        </ons-page>
+</ons-template>
+
+<ons-template id="BillsPage">
+        <ons-page> <!--ng-controller="DevicesControl"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Bill Page</div>
+                </ons-toolbar>
+				
+
+                <div ng-controller="BillsPage">
+				<ons-list>
+					<ons-list-item  class="item">
+						<ons-row>
+							<ons-col>
+								<header style="margin-left:25px">
+								<span class="item-title">Bill is {{billJSON.charge}} AED<br>{{stat}}</span>
+								</header>
+							</ons-col>
+						</ons-row>
+					</ons-list-item>
+				</ons-list>
+						<br>
+				<ons-button modifier="small" class="button-bar" style="text-align:center" ng-click="payBill()" id="pay_btn">Pay Bill</ons-button>
+                </div>
+
+        </ons-page>
+</ons-template>
+
+<ons-template id="DeleteStuff">
+        <ons-page> <!--ng-controller="DevicesControl"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Delete Page</div>
+                </ons-toolbar>
+        
+                <div ng-controller="DeleteStuff">
+                        <br> <!--"DevicesControl"-->
+                        <ons-button modifier="large" ng-click="deleteHouse()">Delete Property</ons-button>
+                        <br>
+                        <ons-button modifier="large" ng-click="flushPriv()">Flush Privileges</ons-button>
+                </div>
+
+        </ons-page>
+</ons-template>
+
+<ons-template id="DeleteHouse">
+        <ons-page> <!--ng-controller="DevicesControl"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Delete Property</div>
+                </ons-toolbar>
+                
+                <div class="login-form" ng-controller="DeleteHouse">
+                        <input type="username" id="UserID" class="text-input--underbar" placeholder="User ID" value="">
+                        <input type="username" id="HouseID" class="text-input--underbar" placeholder="Property ID" value="">
+                        <input type="username" id="API" class="text-input--underbar" placeholder="API" value="">
+                        
+                        <br><br>
+                        <ons-button modifier="large" class="login-button" ng-click="deleteHouseFunction()">Delete Property</ons-button>        
+                        <br><br>
+                        
+                </div>
+        </ons-page>
+</ons-template>
+
+<ons-template id="FlushPrivileges">
+        <ons-page> <!--ng-controller="DevicesControl"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Flush Privileges</div>
+                </ons-toolbar>
+                
+                <div class="login-form" ng-controller="FlushPrivileges">
+                        <input type="username" id="UserID" class="text-input--underbar" placeholder="User ID" value="">
+						<select type="username" id="privType" class="text-input--underbar" style="width:100%">
+							<option value="community" selected>Community</option>
+							<option value="city">City</option>
+							<option value="state">State</option>
+							<option value="country">Country</option>
+							<option value="admin">Admin</option>
+						</select>
+						
+                        <input type="username" id="secret" class="text-input--underbar" placeholder="Top Secret Key" value="">
+                        
+                        <br><br>
+                        <ons-button modifier="large" class="login-button" ng-click="flushPrivFunction()">Flush Privileges</ons-button>        
+                        <br><br>
+                        
+                </div>
+        </ons-page>
+</ons-template>
+
+
+<ons-template id="HomeOwnerGraphs">
+        <ons-page> <!--ng-controller="ConsumptionAnalysis"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Home Owner Graphs</div>
+                </ons-toolbar>
+				<div ng-controller="HomeOwnerGraphs">
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinHouseAnalysisDashboard.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinDashboard4House-DevicePower.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinHouseTemperatureYearly.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinDashboardHouseHumidityCorrected.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinDashboardHouseDevicesTempPowerRelationship.xdash/viewer?userid=admin&password=password"></iframe>
+				</div>
+        </ons-page>
+</ons-template>        
+    
+
+<ons-template id="countryGraphs">
+        <ons-page> <!--ng-controller="ConsumptionAnalysis"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Country Graphs</div>
+                </ons-toolbar>
+				<div style="width:100%;height:100%" ng-controller="countryGraphs">
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinGeoMap2.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinGeoMap1.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3Afinal%20SLAB%20REPORT.prpti/prpti.view?userid=admin&password=password"></iframe>
+				</div>
+        </ons-page>
+</ons-template>  
+ 
+<ons-template id="cityGraphs">
+        <ons-page> <!--ng-controller="ConsumptionAnalysis"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">City Graphs</div>
+                </ons-toolbar>
+               
+				<div style="width:100%;height:100%" ng-controller="cityGraphs">
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinDahsboardTrrenchGraph.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinDashboard4CityPowerConsumptionAnnual.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinDashboardCityTempHumidityIWithPowerAnnual.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinDashboardCityPowerConsumptionwithSeason.xdash/viewer?userid=admin&password=password"></iframe>
+				</div>
+        </ons-page>
+</ons-template>   
+
+<ons-template id="communityGraphs">
+        <ons-page> <!--ng-controller="ConsumptionAnalysis"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Community Graphs</div>
+                </ons-toolbar>
+               
+				<div style="width:100%;height:100%" ng-controller="communityGraphs">
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AFINALDashboardForPowerConsumptionPerSq.FEET.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinCommunityHouseDashboardYearlyConsumption.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinCommunityDashboard4BuildinmgAGePower.xdash/viewer?userid=admin&password=password"></iframe>
+					<iframe width="100%" height="600px" style="width:100%;height:600px" src="http://192.168.1.109:8080/pentaho/api/repos/%3Ahome%3Aadmin%3AMazinCommunityDashboardTempPowerConsumption.xdash/viewer?userid=admin&password=password"></iframe>
+				</div>
+        </ons-page>
+</ons-template>   
+
+<ons-template id="RegisterHouse">
+        <ons-page> <!--ng-controller="DevicesControl"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Add New Property</div>
+                </ons-toolbar>
+                
+                <div class="login-form" ng-controller="RegisterHouse">
+                        <input type="username" id="UserID" class="text-input--underbar" placeholder="User ID" value="">
+                        <input type="username" id="HouseID" class="text-input--underbar" placeholder="Property ID" value="">
+                        <input type="username" id="HouseAPI" class="text-input--underbar" placeholder="API" value="">
+                        <input type="username" id="HouseName" class="text-input--underbar" placeholder="Property Name" value="">
+                        <select type="username" id="HouseType" class="text-input--underbar" style="width:100%">
+							<option value="house" selected>House</option>
+							<option value="office">Office</option>
+							<option value="industry">Industry</option>
+						</select>
+                        <br><br>
+                        <ons-button modifier="large" class="login-button" ng-click="AddHouseFunction()">Add Property</ons-button>        
+                        <br><br>	
+                </div>
+        </ons-page>
+</ons-template>
+
+<ons-template id="RegisterUser">
+        <ons-page> <!--ng-controller="DevicesControl"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Add New User</div>
+                </ons-toolbar>
+                
+                <div class="login-form" ng-controller="RegisterUser">
+                        <input type="username" id="UserID" class="text-input--underbar" placeholder="User ID" value="">
+                        <input type="username" id="UserName" class="text-input--underbar" placeholder="User Name" value="">
+                        <input type="password" id="Password" class="text-input--underbar" placeholder="Password" value="">
+                        
+                        <br><br>
+                        <ons-button modifier="large" class="login-button" ng-click="AddUserFunction()">Add User</ons-button>        
+                        <br><br>
+                        
+                </div>
+        </ons-page>
+</ons-template>
+
+<ons-template id="UpdateUser">
+        <ons-page> <!--ng-controller="DevicesControl"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Update User</div>
+                </ons-toolbar>
+                
+                <div class="login-form" ng-controller="UpdateUser">
+                        <input type="username" id="UserID" class="text-input--underbar" placeholder="User ID" value="">
+                        <input type="username" id="newUserName" class="text-input--underbar" placeholder="New User Name" value="">
+                        <input type="password" id="newPassword" class="text-input--underbar" placeholder="New Password" value="">
+                        <input type="password" id="oldPassword" class="text-input--underbar" placeholder="Old Password" value="">
+                        
+                        <br><br>
+                        <ons-button modifier="large" class="login-button" ng-click="UpdateUserFunction()">Update User</ons-button>        
+                        <br><br>
+                        
+                </div>
+        </ons-page>
+</ons-template>
+
+<ons-template id="AddPrivilege">
+        <ons-page> <!--ng-controller="DevicesControl"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Add Privilege</div>
+                </ons-toolbar>
+                
+                <div class="login-form" ng-controller="AddPrivilege">
+                        <input type="username" id="UserID" class="text-input--underbar" placeholder="User ID" value="">
+						  <select type="username" id="PrivilegeLevel" class="text-input--underbar" style="width:100%">
+							<option value="community" selected>Community</option>
+							<option value="city">City</option>
+							<option value="state">State</option>
+							<option value="country">Country</option>
+							<option value="admin">Admin</option>
+						</select>
+                        <input type="username" id="PrivilegeDomain" class="text-input--underbar" placeholder="Privilege Domain" value="">
+                        <input type="username" id="TopSecretKey" class="text-input--underbar" placeholder="Top Secret Key" value="">
+                        <br><br>
+                        <ons-button modifier="large" class="login-button" ng-click="AddPrivilegeFunction()">Add Privilege</ons-button>        
+                        <br><br>
+                        
+                </div>
+        </ons-page>
+</ons-template>
+
+<ons-template id="RegisterPage">
+        <ons-page> <!--ng-controller="DevicesControl"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Register</div>
+                </ons-toolbar>
+                
+                <div ng-controller="RegisterPage">
+                        <br> <!--"DevicesControl"-->
+                        <ons-button modifier="large" ng-click="RegisterHouse()">Add Property</ons-button>
+                        <br>
+                        <ons-button modifier="large" ng-click="RegisterUser()">Add User</ons-button>
+						<br>
+                        <ons-button modifier="large" ng-click="AddPrivilege()">Add Privilege</ons-button>
+                </div>
+        </ons-page>
+</ons-template>
+
+<ons-template id="UpdatePage">
+        <ons-page> <!--ng-controller="DevicesControl"-->
+                <ons-toolbar>
+                        <div class="left"><ons-back-button>Back</ons-back-button></div>
+                        <div class="center">Update</div>
+                </ons-toolbar>
+                
+                <div ng-controller="UpdatePage">
+						<br>
+                        <ons-button modifier="large" ng-click="UpdateUser()">Update User</ons-button>
+                </div>
+        </ons-page>
+</ons-template>
+
+</body>
+
+</html>
